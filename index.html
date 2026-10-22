@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- 한글 표시와 휴대폰 화면의 크기 조정을 위한 기본 설정입니다. -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>뉴딜 공장 생산 일지 현황</title>
+  <!-- 화면 디자인은 css/style.css, CSV 처리와 화면 갱신은 js/dashboard.js에 있습니다. -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 대시보드 콘텐츠 전체를 감싸고 데스크톱/모바일의 공통 너비를 관리합니다. -->
+  <main class="page-shell">
+    <!-- 페이지 제목과 파일 선택 버튼을 배치하는 최상단 영역입니다. -->
+    <header class="page-header">
+      <div class="heading-copy">
+        <p class="eyebrow">PRODUCTION OVERVIEW</p>
+        <h1>뉴딜 공장 생산 일지 현황</h1>
+        <p class="page-description">생산일지 CSV를 불러와 설비 운영 현황을 확인하세요.</p>
+      </div>
+
+      <!-- label을 클릭하면 연결된 숨김 파일 입력이 열립니다.
+           accept는 파일 선택 창에서 CSV를 우선 보여 주기 위한 안내입니다. -->
+      <label class="file-picker" for="csv-file">
+        <span class="file-picker-icon" aria-hidden="true">＋</span>
+        <span>CSV 파일 선택</span>
+        <input id="csv-file" type="file" accept=".csv,text/csv">
+      </label>
+    </header>
+
+    <!-- 파일을 읽는 중인지, 성공했는지, 문제가 있는지 JavaScript가 알려 줍니다. -->
+    <p id="file-status" class="file-status" role="status" aria-live="polite">
+      아직 불러온 파일이 없습니다. Product_data 폴더의 생산일지 CSV를 선택해 주세요.
+    </p>
+
+    <!-- 총 롤 수, 불량률, 가동률, 로스시간 요약 카드가 들어갑니다.
+         id 값은 js/dashboard.js가 데이터를 넣기 위해 찾는 이름이므로 변경 시 JS도 맞춰야 합니다. -->
+    <section class="summary-section" aria-labelledby="summary-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">AT A GLANCE</p>
+          <h2 id="summary-heading">생산 요약</h2>
+        </div>
+        <span id="date-range" class="date-range">파일을 선택하면 표시됩니다</span>
+      </div>
+
+      <div class="summary-grid">
+        <!-- 각 카드의 metric-value 요소는 CSV를 읽은 뒤 계산된 값으로 교체됩니다. -->
+        <article class="summary-card">
+          <div class="card-label"><span class="metric-dot dot-blue"></span>총 롤 수</div>
+          <p id="total-rolls" class="metric-value">—</p>
+          <p class="metric-note">CSV에 포함된 전체 생산 행</p>
+        </article>
+        <article class="summary-card">
+          <div class="card-label"><span class="metric-dot dot-red"></span>불량률</div>
+          <p id="defect-rate" class="metric-value">—</p>
+          <p id="defect-detail" class="metric-note">NG 판정 비율</p>
+        </article>
+        <article class="summary-card">
+          <div class="card-label"><span class="metric-dot dot-green"></span>가동률</div>
+          <p id="utilization-rate" class="metric-value">—</p>
+          <p class="metric-note">생산시간 ÷ (생산시간 + 로스시간)</p>
+        </article>
+        <article class="summary-card">
+          <div class="card-label"><span class="metric-dot dot-amber"></span>총 로스시간</div>
+          <p id="total-loss-time" class="metric-value">—</p>
+          <p class="metric-note">생산일지 기준 분 단위 합계</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 네 차트는 SVG나 차트 라이브러리 대신 JavaScript가 div 막대를 생성합니다. -->
+    <section class="charts-grid" aria-label="생산 현황 차트">
+      <article class="panel chart-panel" aria-labelledby="equipment-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">BY EQUIPMENT</p>
+            <h2 id="equipment-heading">설비별 생산 롤 수</h2>
+          </div>
+          <span class="chart-icon chart-icon-blue" aria-hidden="true">▮</span>
+        </div>
+        <!-- 설비별 생산량을 세로 막대로 표시하는 자리입니다. -->
+        <div id="equipment-chart" class="vertical-chart empty-chart">
+          <p class="empty-message">CSV를 선택하면 설비별 생산량이 표시됩니다.</p>
+        </div>
+      </article>
+
+      <article class="panel chart-panel" aria-labelledby="daily-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">DAILY OUTPUT</p>
+            <h2 id="daily-heading">일자별 생산 롤 수</h2>
+          </div>
+          <span class="chart-icon chart-icon-violet" aria-hidden="true">▮</span>
+        </div>
+        <!-- 일자별 생산량을 날짜순 세로 막대로 표시하는 자리입니다. -->
+        <div id="daily-chart" class="vertical-chart empty-chart">
+          <p class="empty-message">CSV를 선택하면 일자별 생산량이 표시됩니다.</p>
+        </div>
+      </article>
+
+      <article class="panel chart-panel" aria-labelledby="model-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">BY MODEL</p>
+            <h2 id="model-heading">생산 모델별 생산 롤 수</h2>
+          </div>
+          <span class="chart-icon chart-icon-green" aria-hidden="true">▮</span>
+        </div>
+        <!-- 생산 모델별 생산량을 많은 순서의 세로 막대로 표시하는 자리입니다. -->
+        <div id="model-chart" class="vertical-chart empty-chart">
+          <p class="empty-message">CSV를 선택하면 모델별 생산량이 표시됩니다.</p>
+        </div>
+      </article>
+
+      <article class="panel chart-panel" aria-labelledby="equipment-time-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">PRODUCTION &amp; LOSS TIME</p>
+            <h2 id="equipment-time-heading">설비별 생산·로스 시간</h2>
+          </div>
+          <span class="chart-icon chart-icon-amber" aria-hidden="true">▮</span>
+        </div>
+        <!-- 설비별 생산시간과 로스시간 합계를 같은 시간 눈금으로 나란히 비교합니다. -->
+        <div class="chart-legend" aria-label="그래프 범례">
+          <span><i class="legend-dot legend-production"></i>생산시간(분)</span>
+          <span><i class="legend-dot legend-loss"></i>로스시간(분)</span>
+        </div>
+        <div id="equipment-time-chart" class="vertical-chart grouped-chart empty-chart">
+          <p class="empty-message">CSV를 선택하면 설비별 시간이 표시됩니다.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- CSV의 한 행을 롤 한 건으로 표시합니다. 열 순서를 바꿀 때는 JS의 TABLE_COLUMNS도 함께 확인하세요. -->
+    <section class="panel table-panel" aria-labelledby="table-heading">
+      <div class="panel-heading table-heading">
+        <div>
+          <p class="section-kicker">ROLL DETAILS</p>
+          <h2 id="table-heading">생산 데이터</h2>
+        </div>
+        <div class="table-actions">
+          <!-- 전체/NG 보기 버튼은 표 행만 필터링하며, 요약과 차트의 집계에는 영향을 주지 않습니다. -->
+          <div class="table-filters" role="group" aria-label="표시할 데이터 선택">
+            <button id="show-all-button" class="filter-button is-active" type="button" aria-pressed="true" disabled>
+              전체 <span id="all-row-count">0</span>
+            </button>
+            <button id="show-ng-button" class="filter-button" type="button" aria-pressed="false" disabled>
+              NG <span id="ng-row-count">0</span>
+            </button>
+          </div>
+          <span id="table-count" class="table-count">0건</span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <!-- 표 제목 행은 index.html에서 정의하며, 각 롤의 실제 데이터 행은 JavaScript가 생성합니다. -->
+          <thead>
+            <tr>
+              <th scope="col">생산일자</th>
+              <th scope="col">설비명</th>
+              <th scope="col">MES 번호</th>
+              <th scope="col">생산모델</th>
+              <th scope="col">두께 좌</th>
+              <th scope="col">두께 중</th>
+              <th scope="col">두께 우</th>
+              <th scope="col">두께편차</th>
+              <th scope="col">무게</th>
+              <th scope="col">통기도</th>
+              <th scope="col">인장강도</th>
+              <th scope="col">생산시간(분)</th>
+              <th scope="col">로스시간(분)</th>
+              <th scope="col">판정</th>
+            </tr>
+          </thead>
+          <!-- CSV를 선택하기 전 안내 행을 보여 주고, 선택 후에는 CSV 데이터로 교체합니다. -->
+          <tbody id="roll-table-body">
+            <tr class="placeholder-row">
+              <td colspan="13">CSV를 선택하면 전체 롤 데이터가 여기에 표시됩니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- 전체 보기에서도 NG 판정 행은 배경색으로 구분됩니다. -->
+      <p class="table-legend"><span class="legend-swatch" aria-hidden="true"></span>NG 판정 롤</p>
+    </section>
+
+    <!-- 파일 데이터는 서버로 전송하지 않고 이 브라우저 안에서만 처리됩니다. -->
+    <footer class="page-footer">데이터는 선택한 CSV 파일에서 브라우저 안에서만 처리됩니다.</footer>
+  </main>
+
+  <!-- body 끝에서 스크립트를 불러와 HTML의 요소들이 먼저 생성되도록 합니다. -->
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

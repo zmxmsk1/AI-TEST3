@@ -1,0 +1,674 @@
+/* 공통 글꼴, 기본 색상, 재사용할 색/그림자 변수를 정의합니다.
+   색상이나 카드 그림자 톤을 바꾸고 싶을 때 이 변수부터 조정하면 편리합니다. */
+:root {
+  color-scheme: light;
+  font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
+  color: #182230;
+  background: #f4f7fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --text-muted: #778397;
+  --line: #e8edf4;
+  --blue: #3978f6;
+  --panel-shadow: 0 12px 30px rgba(35, 55, 85, 0.045);
+}
+
+/* width/height 계산에 테두리와 안쪽 여백을 포함해 레이아웃 계산을 단순하게 합니다. */
+* {
+  box-sizing: border-box;
+}
+
+/* 페이지 기본 여백과 최소 너비, 폼 요소 글꼴을 초기화합니다. */
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  /* 넓은 화면에서는 최대 1440px, 좌우 여백을 유지하며 가운데 정렬합니다. */
+  width: min(1440px, calc(100% - 56px));
+  margin: 0 auto;
+  padding: 42px 0 28px;
+}
+
+/* 헤더/섹션 제목에서 요소들을 한 줄에 양끝 정렬하는 공통 레이아웃입니다. */
+.page-header,
+.section-heading,
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+/* 영문 보조 제목과 주요 제목의 공통 기본 간격을 정합니다. */
+.eyebrow,
+.section-kicker {
+  margin: 0 0 7px;
+  color: #8a97a9;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 7px;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.page-description {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* CSV 선택 버튼은 실제 파일 입력을 감싸며, 파일 입력 자체는 화면에서 숨깁니다. */
+.file-picker {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  border: 1px solid #dce6fb;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(57, 120, 246, 0.08);
+  color: #2867e8;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.file-picker:hover {
+  transform: translateY(-1px);
+  border-color: #a9c5ff;
+  background: #f8faff;
+}
+
+.file-picker:focus-within {
+  outline: 3px solid rgba(57, 120, 246, 0.22);
+  outline-offset: 2px;
+}
+
+.file-picker-icon {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+#csv-file {
+  /* input을 display:none으로 감추지 않아 label 및 키보드 접근성을 유지합니다. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+/* 파일을 읽는 동안의 안내, 완료 메시지, 오류 메시지 영역입니다. */
+.file-status {
+  min-height: 38px;
+  margin: 0 0 26px;
+  padding: 11px 14px;
+  border: 1px solid #e5ebf4;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #667489;
+  font-size: 12px;
+}
+
+.file-status.is-error {
+  border-color: #ffd5d5;
+  background: #fff8f8;
+  color: #bd3b3b;
+}
+
+/* 네 개의 요약 카드를 같은 너비로 나열합니다. 작은 화면에서는 아래에서 2열로 바뀝니다. */
+.summary-section {
+  margin-bottom: 22px;
+}
+
+.section-heading {
+  margin-bottom: 13px;
+}
+
+.date-range {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* 카드와 패널이 공유하는 흰 배경, 테두리, 둥근 모서리, 그림자입니다. */
+.summary-card,
+.panel {
+  border: 1px solid #edf0f5;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--panel-shadow);
+}
+
+.summary-card {
+  min-height: 133px;
+  padding: 19px 20px 17px;
+}
+
+.card-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #637187;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metric-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-blue {
+  background: #4b85f7;
+}
+
+.dot-red {
+  background: #ef7180;
+}
+
+.dot-green {
+  background: #39bd8a;
+}
+
+.dot-amber {
+  background: #edae46;
+}
+
+.metric-value {
+  margin: 12px 0 4px;
+  color: #202c3e;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 1.15;
+}
+
+.metric-note {
+  margin: 0;
+  color: #97a1b0;
+  font-size: 10px;
+}
+
+.charts-grid {
+  /* 큰 화면에서는 설비/날짜 차트를 좌우로, 좁은 화면에서는 위아래로 배치합니다. */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.chart-panel {
+  min-height: 315px;
+  padding: 21px 22px 18px;
+}
+
+.panel-heading {
+  margin-bottom: 18px;
+}
+
+.chart-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.chart-icon-blue {
+  background: #eef4ff;
+  color: #4c82ed;
+}
+
+.chart-icon-violet {
+  background: #f3f0ff;
+  color: #8469df;
+}
+
+.chart-icon-green {
+  background: #eaf8f1;
+  color: #2caa75;
+}
+
+.chart-icon-amber {
+  background: #fff5e6;
+  color: #d59330;
+}
+
+.vertical-chart {
+  min-width: 0;
+  height: 190px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 5px 2px 0;
+}
+
+.vertical-chart.empty-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-columns {
+  display: flex;
+  width: 100%;
+  min-width: max-content;
+  height: 180px;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 12px;
+}
+
+.chart-column {
+  display: flex;
+  min-width: 58px;
+  max-width: 104px;
+  flex: 1 0 58px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-plot {
+  /* 각 항목의 막대가 공유하는 세로 플롯 영역과 바닥 기준선입니다. */
+  display: flex;
+  width: 100%;
+  height: 142px;
+  flex: 0 0 142px;
+  align-items: stretch;
+  justify-content: center;
+  gap: 5px;
+  border-bottom: 1px solid #e7ebf2;
+}
+
+.chart-series-bar {
+  position: relative;
+  width: 34px;
+  max-width: calc((100% - 5px) / 2);
+  height: 100%;
+  flex: 0 1 34px;
+}
+
+.grouped-chart .chart-series-bar {
+  width: 25px;
+  flex-basis: 25px;
+}
+
+.chart-bar-fill {
+  /* 실제 세로 길이는 JavaScript가 최대값 대비 퍼센트로 설정합니다. */
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 5px 5px 0 0;
+  transition: height 250ms ease;
+}
+
+.chart-bar-value {
+  position: absolute;
+  left: 50%;
+  color: #59677d;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.chart-category {
+  display: -webkit-box;
+  width: 100%;
+  max-height: 34px;
+  overflow: hidden;
+  padding-top: 6px;
+  color: #647187;
+  font-size: 9px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-align: center;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -7px 0 5px;
+  color: #758196;
+  font-size: 10px;
+}
+
+.chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.legend-production {
+  background: #3978f6;
+}
+
+.legend-loss {
+  background: #edae46;
+}
+
+.empty-message {
+  margin: 0;
+  color: #a0aaba;
+  font-size: 12px;
+  text-align: center;
+}
+
+.bar-fill-blue {
+  background: linear-gradient(180deg, #71a2ff, #3978f6);
+}
+
+.bar-fill-violet {
+  background: linear-gradient(180deg, #aa9bf5, #8069df);
+}
+
+.bar-fill-green {
+  background: linear-gradient(180deg, #67d3a3, #2caa75);
+}
+
+.bar-fill-amber {
+  background: linear-gradient(180deg, #f5c879, #e3a13c);
+}
+
+.table-panel {
+  overflow: hidden;
+  padding: 21px 22px 15px;
+}
+
+.table-heading {
+  margin-bottom: 15px;
+}
+
+.table-actions,
+.table-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-filters {
+  /* 표 위의 전체/NG 버튼을 작은 선택 탭처럼 묶어 보여 줍니다. */
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #e9edf3;
+  border-radius: 9px;
+  background: #f7f9fc;
+}
+
+.filter-button {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #748197;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.filter-button.is-active {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(37, 53, 78, 0.12);
+  color: #2867e8;
+}
+
+.filter-button:focus-visible {
+  outline: 2px solid rgba(57, 120, 246, 0.35);
+  outline-offset: 1px;
+}
+
+.filter-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.filter-button span {
+  min-width: 17px;
+  padding: 1px 4px;
+  border-radius: 8px;
+  background: #edf1f7;
+  color: #65738a;
+  font-size: 9px;
+  text-align: center;
+}
+
+.table-count {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #f2f5fa;
+  color: #65738a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 표의 열이 화면보다 넓어지면 페이지 전체 대신 이 영역만 좌우로 스크롤합니다. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid #e9edf3;
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+thead {
+  background: #f7f9fc;
+  color: #66748a;
+}
+
+th,
+td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #edf0f5;
+  text-align: left;
+}
+
+th {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody td {
+  color: #526075;
+}
+
+tbody tr:hover td {
+  background: #fafcff;
+}
+
+tbody tr.ng-row td {
+  /* 판정값이 NG인 행에 적용되며 정상 행과 색상으로 구분합니다. */
+  background: #fff3f2;
+  color: #9b4b4b;
+}
+
+tbody tr.ng-row:hover td {
+  background: #ffedeb;
+}
+
+.placeholder-row td {
+  height: 90px;
+  color: #a0aaba;
+  text-align: center;
+}
+
+.table-legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 11px 0 0;
+  color: #8490a1;
+  font-size: 10px;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #f6c9c5;
+}
+
+.page-footer {
+  padding-top: 17px;
+  color: #9aa4b2;
+  font-size: 10px;
+  text-align: right;
+}
+
+/* 태블릿 폭: 카드들을 2열로, 두 차트는 세로 한 열로 전환합니다. */
+@media (max-width: 900px) {
+  .page-shell {
+    width: min(100% - 36px, 700px);
+    padding-top: 30px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-panel {
+    min-height: 260px;
+  }
+}
+
+/* 휴대폰 폭: 헤더와 섹션 제목을 세로로 놓고 카드/차트의 여백을 줄입니다. */
+@media (max-width: 540px) {
+  .page-shell {
+    width: calc(100% - 28px);
+    padding-top: 24px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .file-picker {
+    width: 100%;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary-grid {
+    gap: 10px;
+  }
+
+  .summary-card {
+    min-height: 124px;
+    padding: 15px 14px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .chart-panel,
+  .table-panel {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .table-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .table-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chart-column {
+    min-width: 54px;
+    flex-basis: 54px;
+  }
+}
+
+/* 운영체제에서 애니메이션 최소화를 요청한 경우 막대 전환 효과를 거의 제거합니다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
